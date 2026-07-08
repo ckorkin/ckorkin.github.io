@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes"/>
+<title>Индастро Firebond Protect FZ911 — калькулятор эффективности для дилеров</title>
+<meta name="description" content="TCO-калькулятор для дилеров: сравнение текущего противопригарного покрытия с Индастро Firebond Protect FZ911 — экономия на материале, браке и финишной обработке.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+    --bg:            #080b12;
+    --bg-panel:      #0f141e;
+    --bg-panel-2:    #141b28;
+    --line:          rgba(255,255,255,0.08);
+    --line-strong:   rgba(255,255,255,0.16);
+    --text:          #e8edf5;
+    --muted:         #8d99ad;
+    --muted-dim:     #626e82;
+
+    --ember:         #c44536;
+    --ember-bright:  #e05a3f;
+    --ember-dim:     #8c3126;
+    --molten:        #ffab5e;
+    --molten-soft:   #ffd7a8;
+    --steel:         #2d3a4a;
+    --steel-light:   #3c4d61;
+    --good:          #4caf7d;
+
+    --font-display:  'Oswald', 'Arial Narrow', sans-serif;
+    --font-body:     'Inter', system-ui, sans-serif;
+    --font-mono:     'IBM Plex Mono', 'Consolas', monospace;
+
+    --radius-s: 10px;
+    --radius-m: 16px;
+    --radius-l: 22px;
+    --ease: cubic-bezier(.22,.75,.32,1);
+}
+*{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; margin:0; padding:0; }
+html{ scroll-behavior:smooth; }
+body{
+    font-family: var(--font-body);
+    background:
+        radial-gradient(ellipse 900px 460px at 50% 0%, rgba(196,69,54,.10), transparent 60%),
+        var(--bg);
+    color: var(--text);
+    line-height:1.6;
+    padding: 20px 14px 40px;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+}
+@media (min-width:768px){ body{ padding:36px 24px 56px; } }
+h1,h2,h3,h4,h5{ font-family: var(--font-display); letter-spacing:.01em; }
+
+.grain-overlay{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    opacity:.045; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.container {
+    position:relative; z-index:1;
+    max-width: 1180px;
+    width: 100%;
+    margin: 0 auto;
+    background: var(--bg-panel);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-l);
+    padding: 22px 18px 28px;
+    box-shadow: 0 30px 80px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.03);
+    overflow:hidden;
+}
+@media (min-width: 768px) { .container { padding: 38px 40px 40px; } }
+.hazard-strip{
+    height:6px; margin:0 -18px 22px; width:calc(100% + 36px);
+    background: repeating-linear-gradient(135deg, var(--ember) 0 16px, #0a0e17 16px 32px);
+    background-size: 45px 45px;
+}
+@media (min-width: 768px){ .hazard-strip{ margin:0 -40px 26px; width:calc(100% + 80px); } }
+
+/* ---------- Шапка ---------- */
+.header {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 14px; margin-bottom: 18px;
+}
+.brand { display: flex; align-items: center; gap: 14px; }
+.logo-img{ height:36px; width:auto; flex-shrink:0; filter: drop-shadow(0 0 10px rgba(196,69,54,.25)); }
+.logo-divider{ width:1px; height:30px; background: var(--line-strong); flex-shrink:0; }
+.brand-text {
+    font-family: var(--font-display); font-size:16px; font-weight:600; color:#fff;
+    line-height:1.2; letter-spacing:.04em;
+}
+.brand-text small {
+    display:block; font-family: var(--font-body); font-weight:400; font-size:11.5px;
+    color: var(--muted); letter-spacing:.02em; margin-top:1px;
+}
+
+/* ---------- Технический блок (спецификация) ---------- */
+.tech-block {
+    display: grid; grid-template-columns: 1fr; gap:0;
+    background: var(--bg-panel-2); border-radius: var(--radius-m);
+    border: 1px solid var(--line); margin-bottom: 20px; overflow:hidden;
+}
+@media (min-width:640px){ .tech-block{ grid-template-columns: repeat(2, 1fr); } }
+@media (min-width:980px){ .tech-block{ grid-template-columns: repeat(4, 1fr) 1.6fr; } }
+.tech-item {
+    display:flex; flex-direction:column; gap:3px; justify-content:center;
+    padding:13px 16px; border-bottom:1px solid var(--line);
+}
+@media (min-width:640px){ .tech-item{ border-right:1px solid var(--line); } }
+.tech-item .tlabel{
+    font-family: var(--font-mono); font-size:10.5px; letter-spacing:.06em; text-transform:uppercase;
+    color: var(--muted);
+}
+.tech-item .value{ font-family: var(--font-mono); font-weight:600; color:#fff; font-size:14.5px; }
+.tech-item .composition{ font-size:12.5px; color: var(--muted); line-height:1.55; }
+.tech-item .composition strong{ color: var(--text); font-weight:600; }
+
+/* ---------- Подзаголовок ---------- */
+.subhead {
+    color: var(--muted); margin: 0 0 22px 0; font-size: 14.5px;
+    border-left: 3px solid var(--ember); padding: 14px 18px;
+    background: var(--bg-panel-2); border-radius: 0 12px 12px 0; line-height: 1.7;
+}
+.subhead strong { color:#fff; }
+.subhead .tag-rd {
+    display:inline-block; font-family: var(--font-mono); font-size:10.5px; letter-spacing:.08em;
+    text-transform:uppercase; color: var(--ember-bright); border:1px solid rgba(196,69,54,.4);
+    background: rgba(196,69,54,.08); padding:3px 11px; border-radius: 20px; margin-bottom:8px;
+}
+
+/* ---------- Две колонки ---------- */
+.grid-2col { display: grid; grid-template-columns: 1fr; gap: 20px; margin-bottom: 4px; }
+@media (min-width: 768px) { .grid-2col { grid-template-columns: 1fr 1fr; gap: 26px; } }
+.card {
+    border-radius: var(--radius-m); padding: 20px 18px 22px;
+    border: 1px solid var(--line); background: var(--bg-panel-2); position:relative;
+}
+.card.current{ border-left: 4px solid var(--steel-light); }
+.card.proposed{ border-left: 4px solid var(--ember); }
+.card.proposed .ribbon {
+    position: absolute; top: -10px; right: 14px;
+    font-family: var(--font-mono); background: var(--ember); color: #fff;
+    padding: 3px 14px; border-radius: 30px; font-size: 10.5px; font-weight:600; letter-spacing: .06em;
+    box-shadow: 0 4px 14px rgba(196,69,54,.4);
+}
+.card h2 {
+    font-size: 17px; font-weight:600; color:#fff; margin: 0 0 18px 0;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap; text-transform:uppercase; letter-spacing:.01em;
+}
+.card h2 .tag {
+    font-family: var(--font-body); text-transform:none; letter-spacing:0;
+    font-size: 11.5px; font-weight:500; background: rgba(255,255,255,.06);
+    padding: 3px 12px; border-radius: 30px; color: var(--muted);
+}
+.card.proposed h2 .tag { background: rgba(196,69,54,.15); color: var(--molten-soft); }
+
+.param { margin-bottom: 15px; display: flex; flex-direction: column; gap: 5px; }
+.param label {
+    font-size: 13.5px; font-weight:500; color: var(--text);
+    display: flex; justify-content: space-between; align-items: center; gap:8px;
+}
+.param label .unit { font-weight: 400; color: var(--muted-dim); font-size: 11.5px; white-space:nowrap; }
+.param input {
+    width: 100%; padding: 12px 14px; border: 1px solid var(--line-strong); border-radius: 12px;
+    font-size: 16px; background: var(--bg); color: var(--text); font-family: var(--font-mono);
+    font-weight:600; transition: .15s var(--ease); -webkit-appearance:none; appearance:none;
+    touch-action: manipulation;
+}
+.param input::placeholder{ color: var(--muted-dim); font-family: var(--font-body); font-weight:400; }
+.param input:focus { outline: none; border-color: var(--ember-bright); box-shadow: 0 0 0 3px rgba(224,90,63,.18); }
+.param input.dealer-price-field{ border-color: rgba(196,69,54,.55); background: rgba(196,69,54,.06); }
+.param .hint { font-size: 11.5px; color: var(--muted); line-height:1.5; }
+.param .hint strong { color: var(--molten); }
+
+/* Статичное поле (не редактируемое, синхронизировано с левой колонкой) */
+.static-row{
+    display:flex; justify-content:space-between; align-items:center; gap:10px;
+    background: var(--bg); border:1px solid var(--line); border-radius:12px; padding:11px 14px;
+}
+.static-row .slabel{ font-size:13px; color: var(--muted); }
+.static-row .svalue{ font-family: var(--font-mono); font-weight:600; color:#fff; font-size:14.5px; white-space:nowrap; }
+.static-row .ssync{ font-family: var(--font-mono); font-size:9.5px; letter-spacing:.05em; text-transform:uppercase; color: var(--muted-dim); }
+
+.rd-note{
+    margin-top:16px; background: rgba(196,69,54,.08); border:1px solid rgba(196,69,54,.3);
+    border-radius: var(--radius-s); padding:12px 15px; font-size:13px; color: var(--text); line-height:1.5;
+}
+.rd-note strong{ color: var(--molten); }
+
+/* ---------- Результаты ---------- */
+.result-area { margin-top: 26px; display: grid; grid-template-columns: 1fr; gap: 14px; }
+@media (min-width: 600px) { .result-area { grid-template-columns: 1fr 1fr 1fr; gap: 18px; } }
+.result-card {
+    background: var(--bg-panel-2); border-radius: var(--radius-m); padding: 20px 18px;
+    border: 1px solid var(--line); text-align: center;
+}
+.result-card .label {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing:.06em; text-transform:uppercase;
+    color: var(--muted); margin-bottom:8px;
+}
+.result-card .number { font-family: var(--font-display); font-size: 30px; font-weight:700; margin: 2px 0 4px; letter-spacing:-.01em; }
+.result-card .number.molten { color: var(--molten); }
+.result-card .number.ember { color: var(--ember-bright); }
+.result-card .number.muted { color: var(--muted); }
+.result-card .sub { font-size: 12px; color: var(--muted-dim); }
+.result-card .pill {
+    font-family: var(--font-mono); background: rgba(255,255,255,.06); border-radius: 30px;
+    padding: 2px 12px; display: inline-block; font-size: 10.5px; font-weight:600; color: var(--muted);
+    letter-spacing:.05em; text-transform:uppercase;
+}
+.result-card.highlight-card { border-color: rgba(196,69,54,.5); background: linear-gradient(160deg, rgba(196,69,54,.09), var(--bg-panel-2)); }
+
+/* ---------- Графики ---------- */
+.charts-grid { display: grid; grid-template-columns: 1fr; gap: 18px; margin-top: 26px; }
+@media (min-width: 768px) { .charts-grid { grid-template-columns: 1fr 1fr; gap: 22px; } }
+.chart-wrapper { padding: 16px 16px 12px; background: var(--bg-panel-2); border-radius: var(--radius-m); border: 1px solid var(--line); }
+.chart-wrapper h3 { font-size: 15px; font-weight:600; margin: 0 0 2px 0; color:#fff; text-transform:uppercase; letter-spacing:.01em; }
+.chart-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.chart-head h3{ margin:0; }
+.reduction-badge{
+    font-family: var(--font-mono); font-size:12px; font-weight:700; color: var(--good);
+    background: rgba(76,175,125,.12); border:1px solid rgba(76,175,125,.35);
+    padding: 3px 11px; border-radius: 20px; white-space:nowrap;
+}
+.reduction-badge.neutral{ color: var(--muted); background: rgba(255,255,255,.05); border-color: var(--line-strong); }
+.chart-wrapper .chart-sub { font-size: 11.5px; color: var(--muted); margin-bottom: 12px; }
+.chart-container { position: relative; width: 100%; height: 200px; }
+@media (min-width: 768px) { .chart-container { height: 220px; } }
+.chart-container canvas { width: 100% !important; height: 100% !important; display: block; border-radius: 10px; }
+
+/* ---------- Футер ---------- */
+.footer {
+    margin-top: 28px; border-top: 1px solid var(--line); padding-top: 20px;
+    display: flex; flex-direction: column; gap: 16px; font-size: 12.5px; color: var(--muted);
+}
+.footer strong{ color:#fff; }
+.footer .formula{ background: var(--bg-panel-2); border:1px solid var(--line); border-radius: var(--radius-s); padding:12px 15px; line-height:1.6; }
+.footer .formula .fnote{ display:block; font-size: 11px; color: var(--muted-dim); margin-top:6px; }
+.footer .manufacturer { display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 12px; }
+.footer .manufacturer span{ color: var(--muted-dim); }
+.footer .btn-group { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+@media (min-width: 768px){
+    .footer{ flex-direction:row; justify-content:space-between; align-items:center; flex-wrap:wrap; }
+    .footer .formula{ flex: 1 1 100%; }
+    .footer .btn-group{ justify-content:flex-end; }
+}
+
+.btn {
+    background: var(--ember); color: #fff; border: none; padding: 13px 28px; border-radius: 40px;
+    font-weight:600; font-size: 15px; cursor: pointer; transition: .2s var(--ease);
+    touch-action: manipulation; flex: 1 1 auto; min-width: 160px; box-shadow: 0 6px 22px rgba(196,69,54,.3);
+}
+.btn:hover { background: var(--ember-bright); transform: translateY(-2px); }
+.btn-outline { background: rgba(255,255,255,.05); border: 1px solid var(--line-strong); color: var(--text); box-shadow:none; }
+.btn-outline:hover { background: rgba(255,255,255,.1); transform:none; }
+
+input, button { border-radius: 12px; font-family: inherit; }
+input[type="number"] { -moz-appearance: textfield; }
+input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+.toast{
+    position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(20px);
+    background: var(--bg-panel-2); border:1px solid var(--ember); color:#fff; padding:12px 22px;
+    border-radius: 30px; font-size:13.5px; font-weight:500; box-shadow:0 10px 30px rgba(0,0,0,.5);
+    opacity:0; pointer-events:none; transition:.25s var(--ease); z-index:2000;
+}
+.toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<div class="grain-overlay" aria-hidden="true"></div>
+<div class="container">
+    <div class="hazard-strip" aria-hidden="true"></div>
+
+    <!-- Шапка -->
+    <div class="header">
+        <div class="brand">
+            <img class="logo-img" alt="INDASTRO" src="data:image/png;base64,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">
+            <div class="logo-divider"></div>
+            <div class="brand-text">FIREBOND <small>Protect FZ911 — калькулятор эффективности</small></div>
+        </div>
+    </div>
+
+    <!-- Технические характеристики -->
+    <div class="tech-block">
+        <div class="tech-item"><span class="tlabel">Нанесение</span><span class="value">Кисть, распыление</span></div>
+        <div class="tech-item"><span class="tlabel">Плотность, г/см³</span><span class="value">1,8–2,1</span></div>
+        <div class="tech-item"><span class="tlabel">Вязкость ВЗ-4, с</span><span class="value">23–28</span></div>
+        <div class="tech-item"><span class="tlabel">Седиментация</span><span class="value">≥98%</span></div>
+        <div class="tech-item"><span class="composition"><strong>Состав:</strong> высокодисперсный цирконовый концентрат в спиртовом растворе полимерного связующего, модифицированный пакетом функциональных добавок для адгезии и седиментационной устойчивости. Упаковка — вёдра 30 кг.</span></div>
+    </div>
+
+    <div class="subhead">
+        <span class="tag-rd">Разработано по результатам испытаний</span><br/>
+        <strong>Индастро Firebond Protect FZ911</strong> — противопригарное покрытие на спиртовой основе (силикат циркония) для мелкого, среднего и крупного стального и чугунного литья.
+        Рецептура обеспечивает глубокое проникновение в поры, высокую адгезию и огнеупорность, что снижает пригар, улучшает качество поверхности и сокращает трудозатраты на зачистку.
+    </div>
+
+    <!-- Две колонки -->
+    <div class="grid-2col">
+        <!-- Текущее покрытие -->
+        <div class="card current">
+            <h2>Текущее покрытие <span class="tag">исходное</span></h2>
+            <div class="param">
+                <label for="priceCurrent">Цена за кг <span class="unit">₽ с НДС</span></label>
+                <input type="number" id="priceCurrent" value="650" step="10" min="0" inputmode="decimal" lang="en"/>
+            </div>
+            <div class="param">
+                <label for="consumptionCurrent">Расход на 1 м² поверхности <span class="unit">кг/м²</span></label>
+                <input type="number" id="consumptionCurrent" value="0.45" step="0.01" min="0" inputmode="decimal" lang="en"/>
+                <div class="hint">Зависит от способа нанесения и пористости формы</div>
+            </div>
+            <div class="param">
+                <label for="defectCurrent">Доля брака из-за пригара <span class="unit">%</span></label>
+                <input type="number" id="defectCurrent" value="4.5" step="0.1" min="0" max="20" inputmode="decimal" lang="en"/>
+            </div>
+            <div class="param">
+                <label for="reworkCost">Стоимость зачистки 1 т брака <span class="unit">₽/т</span></label>
+                <input type="number" id="reworkCost" value="8500" step="100" min="0" inputmode="decimal" lang="en"/>
+                <div class="hint">Включает шлифовку, доводку, переделку</div>
+            </div>
+            <div class="param">
+                <label for="annualArea">Годовая площадь окрашивания <span class="unit">м²</span></label>
+                <input type="number" id="annualArea" value="5000" step="500" min="0" inputmode="decimal" lang="en"/>
+                <div class="hint">Общая площадь поверхности всех форм и стержней за год</div>
+            </div>
+        </div>
+
+        <!-- Индастро Firebond Protect FZ911 -->
+        <div class="card proposed">
+            <div class="ribbon">ПО ТУ 12.25</div>
+            <h2>Индастро FZ911 <span class="tag">ваше предложение</span></h2>
+            <div class="param">
+                <label for="priceProposed">Ваша цена за кг <span class="unit">₽ с НДС</span></label>
+                <input type="number" id="priceProposed" value="" step="10" min="0" placeholder="Введите вашу цену" inputmode="decimal" lang="en" class="dealer-price-field"/>
+            </div>
+            <div class="param">
+                <label for="consumptionProposed">Расход на 1 м² поверхности <span class="unit">кг/м²</span></label>
+                <input type="number" id="consumptionProposed" value="0.20" step="0.01" min="0" inputmode="decimal" lang="en"/>
+                <div class="hint">На 55% ниже за счёт высокой плотности (1,8–2,1 г/см³) и глубокого проникновения</div>
+            </div>
+            <div class="param">
+                <label for="defectProposed">Доля брака из-за пригара <span class="unit">%</span></label>
+                <input type="number" id="defectProposed" value="1.2" step="0.1" min="0" max="10" inputmode="decimal" lang="en"/>
+                <div class="hint">Снижение в 3–4 раза благодаря рецептуре покрытия</div>
+            </div>
+            <div class="param">
+                <label for="finishReduction">Снижение затрат на финишную обработку <span class="unit">%</span></label>
+                <input type="number" id="finishReduction" value="40" step="5" min="0" max="80" inputmode="decimal" lang="en"/>
+                <div class="hint">За счёт чистоты поверхности — меньше шлифовки и доводки</div>
+            </div>
+            <div class="static-row">
+                <span class="slabel">Стоимость зачистки, ₽/т</span>
+                <span class="svalue" id="reworkCostProposedView">8500</span>
+                <span class="ssync">= левая колонка</span>
+            </div>
+            <div class="rd-note">Разработано на основе научных исследований и подтверждено испытаниями на реальных производствах.</div>
+        </div>
+    </div>
+
+    <!-- Результаты -->
+    <div class="result-area">
+        <div class="result-card">
+            <div class="label">Экономия на покрытии</div>
+            <div class="number molten" id="savingsMaterial">—</div>
+            <div class="sub">за год, за счёт цены и расхода на м²</div>
+        </div>
+        <div class="result-card">
+            <div class="label">Экономия на браке и зачистке</div>
+            <div class="number molten" id="savingsDefect">—</div>
+            <div class="sub">снижение брака + уменьшение трудозатрат</div>
+        </div>
+        <div class="result-card highlight-card">
+            <div class="label">Итоговая годовая экономия</div>
+            <div class="number ember" id="totalSavings">—</div>
+            <div class="sub"><span class="pill">TCO</span> <span id="totalSavingsSub">введите вашу цену для расчёта</span></div>
+        </div>
+    </div>
+
+    <!-- Графики -->
+    <div class="charts-grid">
+        <div class="chart-wrapper">
+            <h3>Накопленная экономия</h3>
+            <div class="chart-sub">за 5 лет с учётом роста объёмов +3% в год</div>
+            <div class="chart-container"><canvas id="paybackCanvas"></canvas></div>
+        </div>
+        <div class="chart-wrapper">
+            <div class="chart-head">
+                <h3>Снижение брака</h3>
+                <span class="reduction-badge" id="defectReductionBadge">—</span>
+            </div>
+            <div class="chart-sub">годовой объём брака (тонн) при переходе на FZ911</div>
+            <div class="chart-container"><canvas id="defectCanvas"></canvas></div>
+        </div>
+    </div>
+
+    <!-- Футер -->
+    <div class="footer">
+        <div class="formula">
+            <strong>Как считаем (метрика — м²):</strong> Экономия на материале = (Цена₀ × Расход₀ − Цена₁ × Расход₁) × Площадь.
+            Экономия на браке = (Брак₀ − Брак₁) × Объём металла из форм × Стоимость зачистки / 100 + экономия на финишной обработке.
+            <span class="fnote">Для пересчёта брака используется средний съём металла с 1 м² формы (0,4 т/м²).</span>
+        </div>
+        <div class="manufacturer">
+            <span>Упаковка: вёдра 30 кг (18 шт/поддон)</span>
+            <span>ООО «Седрус» / торговая марка INDASTRO</span>
+            <span>+7 (495) 226-18-53</span>
+            <span>indastro.ru</span>
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-outline" id="resetBtn">Сбросить к примерам</button>
+            <button class="btn" id="copyBtn">Скопировать результат</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function() {
+    // --- Получение элементов ---
+    const priceCur = document.getElementById('priceCurrent');
+    const consCur = document.getElementById('consumptionCurrent');
+    const defectCur = document.getElementById('defectCurrent');
+    const rework = document.getElementById('reworkCost');
+    const area = document.getElementById('annualArea');
+
+    const priceProp = document.getElementById('priceProposed');
+    const consProp = document.getElementById('consumptionProposed');
+    const defectProp = document.getElementById('defectProposed');
+    const finishRed = document.getElementById('finishReduction');
+    const reworkPropView = document.getElementById('reworkCostProposedView');
+
+    const savingsMat = document.getElementById('savingsMaterial');
+    const savingsDef = document.getElementById('savingsDefect');
+    const totalSav = document.getElementById('totalSavings');
+    const totalSavSub = document.getElementById('totalSavingsSub');
+
+    const paybackCanvas = document.getElementById('paybackCanvas');
+    const defectCanvas = document.getElementById('defectCanvas');
+    const defectBadge = document.getElementById('defectReductionBadge');
+    const toastEl = document.getElementById('toast');
+
+    // --- Вспомогательные функции ---
+    function parseNumber(value) {
+        if (typeof value === 'string') value = value.replace(',', '.').trim();
+        const n = parseFloat(value);
+        return isNaN(n) ? 0 : n;
+    }
+
+    function formatRUB(num) {
+        const sign = num < 0 ? '−' : '';
+        num = Math.abs(num);
+        if (num === 0) return '0 ₽';
+        if (num >= 1e6) return sign + (num / 1e6).toFixed(1) + ' млн ₽';
+        if (num >= 1e3) return sign + (num / 1e3).toFixed(0) + ' тыс. ₽';
+        return sign + Math.round(num) + ' ₽';
+    }
+
+    let toastTimer;
+    function showToast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2600);
+    }
+
+    // --- График "Накопленная экономия" (бар-чарт) ---
+    function drawPaybackChart(canvas, data) {
+        const ctx = canvas.getContext('2d');
+        const rect = canvas.parentElement.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        const width = rect.width || 600;
+        const height = rect.height || 200;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+        ctx.scale(dpr, dpr);
+
+        const w = width, h = height;
+        const pad = { top: 20, bottom: 30, left: 46, right: 16 };
+        const chartW = w - pad.left - pad.right;
+        const chartH = h - pad.top - pad.bottom;
+
+        ctx.clearRect(0, 0, w, h);
+
+        if (!data || data.length === 0 || data.every(v => v === 0)) {
+            ctx.fillStyle = '#626e82';
+            ctx.font = '13px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Введите вашу цену FZ911 для расчёта', w/2, h/2);
+            return;
+        }
+
+        const maxVal = Math.max(...data, 1);
+        const labels = ['1-й год', '2-й год', '3-й год', '4-й год', '5-й год'];
+        const barWidth = Math.min(chartW / data.length * 0.6, 60);
+        const gap = (chartW - barWidth * data.length) / (data.length + 1);
+
+        ctx.strokeStyle = 'rgba(255,255,255,.16)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(pad.left, pad.top);
+        ctx.lineTo(pad.left, pad.top + chartH);
+        ctx.lineTo(pad.left + chartW, pad.top + chartH);
+        ctx.stroke();
+
+        ctx.fillStyle = '#8d99ad';
+        ctx.font = '10.5px "IBM Plex Mono", monospace';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        const ySteps = 5;
+        for (let i = 0; i <= ySteps; i++) {
+            const val = (maxVal / ySteps) * i;
+            const yPos = pad.top + chartH - (val / maxVal) * chartH;
+            ctx.fillText(Math.round(val/1000) + 'K', pad.left - 8, yPos);
+            ctx.strokeStyle = 'rgba(255,255,255,.06)';
+            ctx.lineWidth = 0.5;
+            ctx.beginPath();
+            ctx.moveTo(pad.left, yPos);
+            ctx.lineTo(pad.left + chartW, yPos);
+            ctx.stroke();
+        }
+
+        for (let i = 0; i < data.length; i++) {
+            const x = pad.left + gap + i * (barWidth + gap);
+            const barH = (data[i] / maxVal) * chartH;
+            const y = pad.top + chartH - barH;
+
+            const grad = ctx.createLinearGradient(0, y, 0, pad.top + chartH);
+            grad.addColorStop(0, '#ffab5e');
+            grad.addColorStop(1, '#c44536');
+            ctx.fillStyle = grad;
+            ctx.fillRect(x, y, barWidth, barH);
+
+            ctx.fillStyle = '#ffab5e';
+            ctx.font = '600 10.5px "IBM Plex Mono", monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+            let label = '';
+            if (data[i] >= 1e6) label = (data[i]/1e6).toFixed(1) + 'M';
+            else if (data[i] >= 1e3) label = (data[i]/1e3).toFixed(0) + 'K';
+            else label = data[i].toString();
+            ctx.fillText(label, x + barWidth/2, y - 5);
+
+            ctx.fillStyle = '#8d99ad';
+            ctx.font = '10px Inter, sans-serif';
+            ctx.textBaseline = 'top';
+            ctx.fillText(labels[i], x + barWidth/2, pad.top + chartH + 5);
+        }
+    }
+
+    // --- График "Снижение брака" (линейный) ---
+    // Плавная кривая через точки (сглаживание квадратичными кривыми Безье)
+    function buildSmoothPath(ctx, pts) {
+        ctx.moveTo(pts[0].x, pts[0].y);
+        for (let i = 0; i < pts.length - 1; i++) {
+            const xc = (pts[i].x + pts[i+1].x) / 2;
+            const yc = (pts[i].y + pts[i+1].y) / 2;
+            ctx.quadraticCurveTo(pts[i].x, pts[i].y, xc, yc);
+        }
+        const last = pts[pts.length - 1];
+        const prev = pts[pts.length - 2];
+        ctx.quadraticCurveTo(prev.x, prev.y, last.x, last.y);
+    }
+
+    function drawDefectChart(canvas, dataCurrent, dataProposed) {
+        const ctx = canvas.getContext('2d');
+        const rect = canvas.parentElement.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        const width = rect.width || 600;
+        const height = rect.height || 200;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+        ctx.scale(dpr, dpr);
+
+        const w = width, h = height;
+        const pad = { top: 26, bottom: 30, left: 40, right: 58 };
+        const chartW = w - pad.left - pad.right;
+        const chartH = h - pad.top - pad.bottom;
+
+        ctx.clearRect(0, 0, w, h);
+
+        if (!dataCurrent || !dataProposed || dataCurrent.length === 0) {
+            ctx.fillStyle = '#626e82';
+            ctx.font = '13px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Нет данных', w/2, h/2);
+            return;
+        }
+
+        const allData = dataCurrent.concat(dataProposed);
+        const maxVal = Math.max(...allData, 1) * 1.12;
+        const baseline = pad.top + chartH;
+        const labels = ['1-й год', '2-й год', '3-й год', '4-й год', '5-й год'];
+
+        // мягкие пунктирные горизонтальные линии сетки
+        ctx.font = '10px "IBM Plex Mono", monospace';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        const ySteps = 4;
+        ctx.setLineDash([3, 5]);
+        for (let i = 0; i <= ySteps; i++) {
+            const val = (maxVal / ySteps) * i;
+            const yPos = baseline - (val / maxVal) * chartH;
+            ctx.strokeStyle = 'rgba(255,255,255,.08)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(pad.left, yPos);
+            ctx.lineTo(pad.left + chartW, yPos);
+            ctx.stroke();
+            ctx.fillStyle = '#626e82';
+            ctx.fillText(val.toFixed(1), pad.left - 8, yPos);
+        }
+        ctx.setLineDash([]);
+
+        function toPoints(data) {
+            return data.map((v, i) => ({
+                x: pad.left + (i / (data.length - 1)) * chartW,
+                y: baseline - (v / maxVal) * chartH
+            }));
+        }
+
+        function drawArea(data, colorTop, colorBottom) {
+            const pts = toPoints(data);
+            ctx.beginPath();
+            buildSmoothPath(ctx, pts);
+            ctx.lineTo(pts[pts.length - 1].x, baseline);
+            ctx.lineTo(pts[0].x, baseline);
+            ctx.closePath();
+            const grad = ctx.createLinearGradient(0, pad.top, 0, baseline);
+            grad.addColorStop(0, colorTop);
+            grad.addColorStop(1, colorBottom);
+            ctx.fillStyle = grad;
+            ctx.fill();
+            return pts;
+        }
+
+        function strokeLine(pts, color, glow) {
+            ctx.beginPath();
+            buildSmoothPath(ctx, pts);
+            ctx.shadowColor = glow;
+            ctx.shadowBlur = 8;
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2.5;
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+        }
+
+        function drawDots(pts, color) {
+            pts.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 3.5, 0, 2 * Math.PI);
+                ctx.fillStyle = '#0f141e';
+                ctx.fill();
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = color;
+                ctx.stroke();
+            });
+        }
+
+        function pillLabel(x, y, text, bg, fg) {
+            ctx.font = '600 10.5px "IBM Plex Mono", monospace';
+            const tw = ctx.measureText(text).width;
+            const pw = tw + 14, ph = 18;
+            const px = x + 8, py = y - ph / 2;
+            ctx.fillStyle = bg;
+            if (ctx.roundRect) {
+                ctx.beginPath();
+                ctx.roundRect(px, py, pw, ph, 9);
+                ctx.fill();
+            } else {
+                ctx.fillRect(px, py, pw, ph);
+            }
+            ctx.fillStyle = fg;
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, px + 7, y + 0.5);
+        }
+
+        // Область "Текущее" (сталь, приглушённая)
+        const ptsCur = drawArea(dataCurrent, 'rgba(141,153,173,.28)', 'rgba(141,153,173,0)');
+        // Область "FZ911" (ember, поверх)
+        const ptsProp = drawArea(dataProposed, 'rgba(224,90,63,.38)', 'rgba(224,90,63,0)');
+
+        strokeLine(ptsCur, '#8d99ad', 'rgba(141,153,173,.5)');
+        strokeLine(ptsProp, '#ffab5e', 'rgba(255,171,94,.6)');
+
+        drawDots(ptsCur, '#8d99ad');
+        drawDots(ptsProp, '#e05a3f');
+
+        pillLabel(ptsCur[ptsCur.length-1].x, ptsCur[ptsCur.length-1].y,
+            dataCurrent[dataCurrent.length-1].toFixed(1) + ' т', 'rgba(141,153,173,.16)', '#c7cedb');
+        pillLabel(ptsProp[ptsProp.length-1].x, ptsProp[ptsProp.length-1].y,
+            dataProposed[dataProposed.length-1].toFixed(1) + ' т', 'rgba(224,90,63,.22)', '#ffab5e');
+
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = '#8d99ad';
+        ctx.font = '10px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        for (let i = 0; i < labels.length; i++) {
+            const x = pad.left + (i / (labels.length - 1)) * chartW;
+            ctx.fillText(labels[i], x, baseline + 6);
+        }
+
+        // легенда
+        const legX = pad.left, legY = pad.top - 12;
+        ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#8d99ad';
+        ctx.beginPath(); ctx.arc(legX, legY, 3.5, 0, 2*Math.PI); ctx.fill();
+        ctx.font = '10px Inter, sans-serif';
+        ctx.fillText('Текущее', legX + 8, legY);
+        ctx.fillStyle = '#e05a3f';
+        ctx.beginPath(); ctx.arc(legX + 66, legY, 3.5, 0, 2*Math.PI); ctx.fill();
+        ctx.fillStyle = '#ffab5e';
+        ctx.fillText('FZ911', legX + 74, legY);
+    }
+
+    // --- Основная функция обновления ---
+    function update() {
+        const pCur = parseNumber(priceCur.value);
+        const cCur = parseNumber(consCur.value);
+        const dCur = parseNumber(defectCur.value);
+        const rCost = parseNumber(rework.value);
+        const sqArea = parseNumber(area.value);
+
+        const pProp = parseNumber(priceProp.value);
+        const cProp = parseNumber(consProp.value);
+        const dProp = parseNumber(defectProp.value);
+        const fRed = parseNumber(finishRed.value);
+
+        reworkPropView.textContent = rCost ? rCost.toLocaleString('ru-RU') : '—';
+
+        const priceMissing = !priceProp.value || pProp <= 0;
+        const metalPerSqM = 0.4; // тонн металла с 1 м² формы
+        const totalMetal = sqArea * metalPerSqM;
+
+        // --- Брак: считается независимо от цены FZ911 ---
+        const growthRate = 1.03;
+        const years = 5;
+        const yearlyDefCur = [];
+        const yearlyDefProp = [];
+        let currentMetalDef = totalMetal;
+        for (let i = 0; i < years; i++) {
+            if (i > 0) currentMetalDef = currentMetalDef * growthRate;
+            yearlyDefCur.push(Math.round((dCur / 100) * currentMetalDef * 10) / 10);
+            yearlyDefProp.push(Math.round((dProp / 100) * currentMetalDef * 10) / 10);
+        }
+        drawDefectChart(defectCanvas, yearlyDefCur, yearlyDefProp);
+
+        if (dCur > 0) {
+            const reduction = Math.round((1 - dProp / dCur) * 100);
+            defectBadge.textContent = (reduction >= 0 ? '−' : '+') + Math.abs(reduction) + '% брака';
+            defectBadge.className = 'reduction-badge' + (reduction <= 0 ? ' neutral' : '');
+        } else {
+            defectBadge.textContent = '—';
+            defectBadge.className = 'reduction-badge neutral';
+        }
+
+        if (priceMissing) {
+            savingsMat.textContent = '—';
+            savingsDef.textContent = '—';
+            totalSav.textContent = '—';
+            totalSav.className = 'number muted';
+            totalSavSub.textContent = 'введите вашу цену для расчёта';
+            drawPaybackChart(paybackCanvas, []);
+            return;
+        }
+
+        const costPerSqmCur = pCur * cCur;
+        const costPerSqmProp = pProp * cProp;
+        const savingPerSqm = costPerSqmCur - costPerSqmProp;
+        const totalSavingMat = savingPerSqm * sqArea;
+
+        const defectDiff = dCur - dProp;
+        const savingDefPerTonMetal = (defectDiff / 100) * rCost;
+        const totalSavingDefBase = savingDefPerTonMetal * totalMetal;
+
+        const remainingDefectRatio = dProp / 100;
+        const finishSavingPerTonMetal = remainingDefectRatio * rCost * (fRed / 100);
+        const totalFinishSaving = finishSavingPerTonMetal * totalMetal;
+
+        const totalSavingDef = totalSavingDefBase + totalFinishSaving;
+        const total = totalSavingMat + totalSavingDef;
+
+        savingsMat.textContent = formatRUB(totalSavingMat);
+        savingsDef.textContent = formatRUB(totalSavingDef);
+        totalSav.textContent = formatRUB(total);
+        if (total < 0) {
+            totalSav.className = 'number ember';
+            totalSavSub.textContent = 'при текущих вводных переход убыточен';
+        } else {
+            totalSav.className = 'number ember';
+            totalSavSub.textContent = 'переход на FZ911 окупается на материале';
+        }
+
+        const yearlyData = [];
+        let cumulative = 0;
+        let currentArea = sqArea;
+        let currentMetal = totalMetal;
+
+        for (let i = 0; i < years; i++) {
+            if (i > 0) {
+                currentArea = currentArea * growthRate;
+                currentMetal = currentMetal * growthRate;
+            }
+            const yearMat = savingPerSqm * currentArea;
+            const yearDefBase = ((dCur - dProp) / 100) * rCost * currentMetal;
+            const yearFinish = (dProp / 100) * rCost * (fRed / 100) * currentMetal;
+            const yearDef = yearDefBase + yearFinish;
+            const yearTotal = yearMat + yearDef;
+            cumulative += yearTotal;
+            yearlyData.push(Math.round(cumulative));
+        }
+
+        drawPaybackChart(paybackCanvas, yearlyData);
+    }
+
+    // --- Обработчики событий ---
+    const inputs = document.querySelectorAll('input[type="number"]');
+    inputs.forEach(inp => {
+        inp.addEventListener('input', function() {
+            if (this.value.includes(',')) this.value = this.value.replace(',', '.');
+            update();
+        });
+        inp.addEventListener('change', update);
+        inp.addEventListener('blur', function() {
+            const min = this.min !== '' ? parseFloat(this.min) : null;
+            const max = this.max !== '' ? parseFloat(this.max) : null;
+            if (this.value === '') return;
+            let v = parseNumber(this.value);
+            if (min !== null && v < min) v = min;
+            if (max !== null && v > max) v = max;
+            this.value = v;
+            update();
+        });
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', function() {
+        priceCur.value = 650;
+        consCur.value = 0.45;
+        defectCur.value = 4.5;
+        rework.value = 8500;
+        area.value = 5000;
+
+        priceProp.value = '';
+        consProp.value = 0.20;
+        defectProp.value = 1.2;
+        finishRed.value = 40;
+        update();
+        showToast('Значения сброшены к примерам');
+    });
+
+    document.getElementById('copyBtn').addEventListener('click', function() {
+        if (!priceProp.value || parseNumber(priceProp.value) <= 0) {
+            showToast('Сначала введите вашу цену FZ911');
+            return;
+        }
+        const totalText = totalSav.textContent;
+        const matText = savingsMat.textContent;
+        const defText = savingsDef.textContent;
+        const msg =
+            `TCO-калькулятор: Индастро Firebond Protect FZ911\n` +
+            `Годовая экономия на покрытии: ${matText}\n` +
+            `Годовая экономия на браке и обработке: ${defText}\n` +
+            `ИТОГО годовая экономия: ${totalText}`;
+        navigator.clipboard.writeText(msg).then(() => {
+            showToast('Результаты скопированы в буфер обмена');
+        }).catch(() => {
+            showToast('Не удалось скопировать — выделите текст вручную');
+        });
+    });
+
+    update();
+    let resizeTimer;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(update, 200);
+    });
+})();
+</script>
+</body>
+</html>
